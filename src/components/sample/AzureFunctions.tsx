@@ -35,18 +35,23 @@ export function AzureFunctions(props: { codePath?: string; docsUrl?: string }) {
     }
     if (needConsent) {
       // await teamsUserCredential!.login(["User.Read"]);
-      const res = await authentication.authenticate({
-        url: `${config.initiateLoginEndpoint}?clientId=${config.clientId}&scope=${encodeURI("User.Read")}&loginHint=bowsong@microsoft.com`,
-        width: 600,
-        height: 535, 
+      // const res = await authentication.authenticate({
+      //   url: `${config.initiateLoginEndpoint}?clientId=${config.clientId}&scope=${encodeURI("User.Read")}&loginHint=bowsong@microsoft.com`,
+      //   width: 600,
+      //   height: 535, 
+      // });
+      const res = await msalClient.loginPopup({
+        scopes: ["User.Read"]
       });
       console.log("-------------------------call login success-------------------------");
-      const account = JSON.parse(res).account
+      const account = res.account
       msalClient.setActiveAccount(account);
       setNeedConsent(false);
     }
     try {
-      const account = msalClient.getActiveAccount();
+      // const account = msalClient.getActiveAccount();
+      const accounts = msalClient.getAllAccounts();
+      const account = accounts[0];
       const request = {
         scopes: ["User.Read"],
         account: account ?? undefined
@@ -54,6 +59,7 @@ export function AzureFunctions(props: { codePath?: string; docsUrl?: string }) {
       const res = await msalClient.acquireTokenSilent(request);
       console.log("-------------------------call silentAuth success-------------------------");
       console.log(JSON.stringify(res));
+      return res;
     } catch (error: any) {
       console.log("-------------------------call silentAuth failed-------------------------");
       console.log(JSON.stringify(error));
