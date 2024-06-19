@@ -4,7 +4,7 @@ import { useData } from "@microsoft/teamsfx-react";
 import * as axios from "axios";
 import { TeamsFxContext } from "../Context";
 import config from "./lib/config";
-import { PublicClientApplication } from "@azure/msal-browser";
+import { PublicClientApplication, createNestablePublicClientApplication } from "@azure/msal-browser";
 import { app, authentication } from "@microsoft/teams-js";
 
 const functionName = config.apiName || "myFunc";
@@ -22,14 +22,13 @@ export function AzureFunctions(props: { codePath?: string; docsUrl?: string }) {
     const msalConfig = {
       auth: {
           clientId: `${config.clientId}`,
-          authority: "https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47",
-          supportsNestedAppAuth: true, // Enable native bridging.
+          authority: "https://login.microsoftonline.com/68a183da-edbf-4d7a-bb06-562717e119ff",
       },
       cache: {
         cacheLocation: "localStorage",
       },
     };
-    const msalClient = await PublicClientApplication.createPublicClientApplication(msalConfig);
+    const msalClient = await createNestablePublicClientApplication(msalConfig);
     if (!teamsUserCredential) {
       throw new Error("TeamsFx SDK is not initialized.");
     }
